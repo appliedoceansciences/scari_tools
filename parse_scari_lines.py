@@ -2,7 +2,7 @@
 import sys
 import base64
 from collections import namedtuple
-
+import numpy as np
 nmea_checksum_errors = 0
 
 def unpack_nibble(bytes, inibble_abs):
@@ -60,49 +60,6 @@ def parse_scari_pspl(line):
                       iband_start = int(iband_start_text),
                       dt=float(dt_text))
 
-def parse_scari_pspls_data_segment(base64_string):
-    try: raw_bytes = base64.b64decode(base64_string)
-    except: return None
-
-    chigh = 0
-    cstep = 0.046875 # dB
-    clow = chigh - 4096.0 * cstep # dB
-
-    # number of percentiles
-    K = 5
-
-    # number of decidecade bands
-    D = (len(raw_bytes) * 2) // (3 * K)
-
-    # extract number between 0 and 4095 inclusive from packed bytes, scale and shift
-    tmp = [unpack_three_nibbles(raw_bytes, 3 * id) * cstep + clow for id in range(D * K)]
-
-    # reshape into length-D list of length-K lists
-    reshaped = [tmp[i:(i + K)] for i in range(0, K * D, K)]
-    return reshaped
-
-def parse_scari_pspls(line):
-    if not line.startswith('$PSPLS,'):
-        return None
-
-    try: payload, suffix = line[1:].split('*')
-    except: return None
-
-    if not validate_nmea(payload, suffix):
-        return None
-
-    try: prefix, dt_text, dt_report_text, iband_start_text, base64_string = payload.split(',')
-    except: return None
-
-    spl_percentiles_dB = parse_scari_pspls_data_segment(base64_string)
-    if spl_percentiles_dB is None: return None
-
-    pspls_tuple = namedtuple('pspls_tuple', [ 'spl_percentiles_dB', 'iband_start', 'dt', 'dt_report' ])
-    return pspls_tuple(spl_percentiles_dB = spl_percentiles_dB,
-                       iband_start = int(iband_start_text),
-                       dt = float(dt_text),
-                       dt_report = float(dt_report_text))
-
 def parse_scari_pgram(line):
     if not '$PGRAM,' in line: return None
 
@@ -126,3 +83,8 @@ def parse_scari_pgram(line):
                        df = float(df_text),
                        dt = float(dt_text),
                        bins_per_octave = float(bins_per_octave_text))
+
+if __name__ == '__main__':
+    for line in sys.stdin:
+        line = line.rstrip()
+        np.savetxt(sys.stdout, np.expand_dims(parse_scari_pspl(line).spls_dB, axis=0), delimiter=',', fmt='%.2f')
