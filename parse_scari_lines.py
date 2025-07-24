@@ -16,6 +16,7 @@ def unpack_three_nibbles(bytes, inibble_abs):
             unpack_nibble(bytes, inibble_abs + 2) << 8)
 
 def validate_nmea(payload, suffix):
+    global nmea_checksum_errors
     checksum = 0
     for byte in payload:
         checksum ^= ord(byte)
