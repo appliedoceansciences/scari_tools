@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# given a list of .wav files, yields their concatenated raw sample data on stdout
 import sys
 import struct
 import os
