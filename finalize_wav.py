@@ -1,0 +1,17 @@
+#!/usr/bin/env python3
+# given a list of .wav files, yields their concatenated raw sample data on stdout
+import sys
+import struct
+import os
+
+f = open(sys.argv[1], 'rb')
+
+riff, filesize_minus_eight_bytes, wave = struct.unpack('4sI4s', f.read(12))
+if riff != b'RIFF' or wave != b'WAVE': exit(1)
+f.close()
+
+f = open(sys.argv[1], 'ab')
+f.truncate(filesize_minus_eight_bytes + 8)
+f.close()
+
+os.rename(sys.argv[1], os.path.splitext(sys.argv[1])[0] + '.wav')
