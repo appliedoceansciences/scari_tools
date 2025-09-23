@@ -114,8 +114,8 @@ def open_tty_as_stdin(path, speed=None):
     c_iflag, c_oflag, c_cflag, c_lflag, ispeed, ospeed, c_cc = termios.tcgetattr(fd_tty)
 
     if speed is not None:
-        ispeed = speed
-        ospeed = speed
+        ispeed = getattr(termios, 'B' + str(speed))
+        ospeed = ispeed
 
     # ignore modem control lines and enable hupcl
     c_cflag |= termios.HUPCL | termios.CLOCAL
