@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 # usage: ./gpzda.py /dev/tty.usbserial-XXXXX 115200"
 
+# copyright 2024- applied ocean sciences
+# isc license
+# point of contact: richard campbell
+
 from datetime import datetime, timezone
 import sys
 from math import floor

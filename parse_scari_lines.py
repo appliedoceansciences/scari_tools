@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+
+# copyright 2024- applied ocean sciences
+# isc license
+# point of contact: richard campbell
+
 import sys
 import base64
 from collections import namedtuple
