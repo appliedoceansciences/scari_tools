@@ -17,7 +17,6 @@ except:
 ser = serial.Serial(sys.argv[1], baudrate=sys.argv[2])
 t = datetime.now(timezone.utc)
 ts = t.timestamp()
-print(ts, file=sys.stderr)
 tt = t.timetuple()
 
 tfrac = ts - floor(ts)
@@ -29,3 +28,5 @@ for byte in bytes(payload, 'utf-8'):
 
 ser.write(("$%s*%02X\r\n" % (payload, cksum)).encode("utf-8"))
 ser.close()
+
+print(ts, file=sys.stderr)
