@@ -14,19 +14,24 @@ try:
 except:
     raise RuntimeError("need to pip3 install pyserial")
 
+def create_and_send_one_gpzda_packet(ser):
+    t = datetime.now(timezone.utc)
+    ts = t.timestamp()
+    tt = t.timetuple()
+
+    tfrac = ts - floor(ts)
+    payload = "GPZDA,%02u%02u%02u.%02u,%02u,%02u,%04u,00,00" % (tt.tm_hour, tt.tm_min, tt.tm_sec, floor(tfrac * 100), tt.tm_mday, tt.tm_mon, tt.tm_year)
+
+    cksum = 0
+    for byte in bytes(payload, 'utf-8'):
+        cksum = cksum ^ byte
+
+    ser.write(("$%s*%02X\r\n" % (payload, cksum)).encode("utf-8"))
+
+    print(ts, file=sys.stderr)
+
 ser = serial.Serial(sys.argv[1], baudrate=sys.argv[2])
-t = datetime.now(timezone.utc)
-ts = t.timestamp()
-tt = t.timetuple()
 
-tfrac = ts - floor(ts)
-payload = "GPZDA,%02u%02u%02u.%02u,%02u,%02u,%04u,00,00" % (tt.tm_hour, tt.tm_min, tt.tm_sec, floor(tfrac * 100), tt.tm_mday, tt.tm_mon, tt.tm_year)
+create_and_send_one_gpzda_packet(ser)
 
-cksum = 0
-for byte in bytes(payload, 'utf-8'):
-    cksum = cksum ^ byte
-
-ser.write(("$%s*%02X\r\n" % (payload, cksum)).encode("utf-8"))
 ser.close()
-
-print(ts, file=sys.stderr)
