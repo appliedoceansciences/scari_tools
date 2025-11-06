@@ -9,10 +9,7 @@ from datetime import datetime, timezone
 import sys
 from math import floor
 
-try:
-    import serial
-except:
-    raise RuntimeError("need to pip3 install pyserial")
+import serial
 
 def create_and_send_one_gpzda_packet(ser):
     t = datetime.now(timezone.utc)
