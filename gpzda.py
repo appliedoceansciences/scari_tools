@@ -10,6 +10,7 @@ import sys
 from math import floor
 
 import serial
+import time
 
 def create_and_send_one_gpzda_packet(ser):
     t = datetime.now(timezone.utc)
@@ -28,6 +29,10 @@ def create_and_send_one_gpzda_packet(ser):
     print(ts, file=sys.stderr)
 
 ser = serial.Serial(sys.argv[1], baudrate=sys.argv[2])
+
+# make sure pyserial is fully initted and attempt to put the uart in a known state
+ser.write('\r\n'.encode('utf-8'))
+time.sleep(0.1)
 
 create_and_send_one_gpzda_packet(ser)
 
