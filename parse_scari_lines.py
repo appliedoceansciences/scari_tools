@@ -93,4 +93,6 @@ def parse_scari_pgram(line):
 if __name__ == '__main__':
     for line in sys.stdin:
         line = line.rstrip()
-        np.savetxt(sys.stdout, np.expand_dims(parse_scari_pspl(line).spls_dB, axis=0), delimiter=',', fmt='%.2f')
+        parsed_as_pspl = parse_scari_pspl(line)
+        if parsed_as_pspl is not None:
+            np.savetxt(sys.stdout, np.expand_dims(parsed_as_pspl.spls_dB, axis=0), delimiter=',', fmt='%.2f')
