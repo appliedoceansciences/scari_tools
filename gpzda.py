@@ -18,7 +18,7 @@ def create_and_send_one_gpzda_packet(ser):
     tt = t.timetuple()
 
     tfrac = ts - floor(ts)
-    payload = "GPZDA,%02u%02u%02u.%02u,%02u,%02u,%04u,00,00" % (tt.tm_hour, tt.tm_min, tt.tm_sec, floor(tfrac * 100), tt.tm_mday, tt.tm_mon, tt.tm_year)
+    payload = "GPZDA,%02u%02u%02u.%06u,%02u,%02u,%04u,00,00" % (tt.tm_hour, tt.tm_min, tt.tm_sec, floor(tfrac * 1000000), tt.tm_mday, tt.tm_mon, tt.tm_year)
 
     cksum = 0
     for byte in bytes(payload, 'utf-8'):
