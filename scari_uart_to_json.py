@@ -71,17 +71,20 @@ def main():
 
         if not validate_nmea(payload, suffix): continue
 
-        if not line.startswith('$PGRAM,'): continue
-
-        try: prefix, dt_text, df_text, bins_per_octave_text, encoded_pixels = payload.split(',')
-        except: continue
-
         # get current time and round to nearest millisecond
         timestamp = round(datetime.now(timezone.utc).timestamp() * 1e3) / 1e3
 
-        message = { 'time': timestamp, 'dt': float(dt_text), 'df': float(df_text), 'bins_per_octave': int(bins_per_octave_text), 'pgram': encoded_pixels }
+        if line.startswith('$PGRAM,'):
+            try: prefix, dt_text, df_text, bins_per_octave_text, encoded_pixels = payload.split(',')
+            except: continue
 
-        print(json.dumps(message), flush=True)
+            print(json.dumps({ 'time': timestamp, 'dt': float(dt_text), 'df': float(df_text), 'bins_per_octave': int(bins_per_octave_text), 'pgram': encoded_pixels }), flush=True)
+
+        elif line.startswith('$PSPL,'):
+            try: prefix, dt_text, iband_start_text, base64_string = payload.split(',')
+            except: continue
+
+            print(json.dumps({ 'time': timestamp, 'dt': float(dt_text), 'iband_start': int(iband_start_text), 'pspl': base64_string }), flush=True)
 
     if nmea_checksum_errors > 0:
         print('nmea checksum errors: %u' % nmea_checksum_errors, file=sys.stderr)
