@@ -9,6 +9,7 @@ import os
 import fcntl
 import tty
 import termios
+from datetime import datetime, timezone
 
 import math
 import time
@@ -73,7 +74,10 @@ def main():
         try: prefix, dt_text, df_text, bins_per_octave_text, encoded_pixels = payload.split(',')
         except: continue
 
-        message = { 'dt': float(dt_text), 'df': float(df_text), 'bins_per_octave': int(bins_per_octave_text), 'pgram': encoded_pixels }
+        # get current time and round to nearest millisecond
+        timestamp = round(datetime.now(timezone.utc).timestamp() * 1e3) / 1e3
+
+        message = { 'time': timestamp, 'dt': float(dt_text), 'df': float(df_text), 'bins_per_octave': int(bins_per_octave_text), 'pgram': encoded_pixels }
 
         print(json.dumps(message), flush=True)
 
