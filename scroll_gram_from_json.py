@@ -77,7 +77,7 @@ def main():
     df_prior = None
     bins_per_octave_prior = None
 
-    gram_clim=(70, 150)
+    gram_clim=(60, 150)
 
     # create an empty figure but don't show it yet
     fig = plt.figure()
