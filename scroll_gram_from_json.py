@@ -53,7 +53,6 @@ def child_thread(main_thread_work):
     for line in sys.stdin:
         if window_closed: break
 
-        print(line.strip(), file=sys.stderr)
         try: message = json.loads(line)
         except: continue
 
