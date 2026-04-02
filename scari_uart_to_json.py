@@ -4,6 +4,16 @@
 # isc license
 # point of contact: richard campbell
 
+# This script reads newline-delimited NMEA-like messages from SCARI on either an actual
+# uart or stdin, and emits newline-delimited JSON messages on stdout, suitable for plotting
+# with one of the scrolling gram plotters, or for further analysis by other code.
+
+# Example usage when SCARI is directly attached to a laptop:
+# ./scari_uart_to_json.py /dev/tty.usbserial-A104OK4B 115200 | ./scroll_spl_from_json.py
+
+# Example usage when SCARI is attached to a remote host accessible via ssh:
+# example: ssh remotehost './scari_uart_to_json.py /dev/ttyAMA0 115200' | ./scroll_spl_from_json.py
+
 import sys
 import os
 import fcntl
