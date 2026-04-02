@@ -76,7 +76,7 @@ def main():
     df_prior = None
     bins_per_octave_prior = None
 
-    gram_clim=(60, 150)
+    gram_clim=(-120, -30)
 
     # create an empty figure but don't show it yet
     fig = plt.figure()
@@ -101,7 +101,7 @@ def main():
             try: pixels = np.asarray(list(base64.b64decode(message['pgram'])))
             except: continue
 
-            chigh = 180
+            chigh = 0
             cstep = 0.75
             clow = chigh - 256.0 * cstep
 
