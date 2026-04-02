@@ -135,7 +135,7 @@ def main():
                     origin='lower',
                     extent=[xextent[0], xextent[1], yextent[0], yextent[1]],
                     aspect=(((xextent[1] - xextent[0]) * Y) / ((yextent[1] - yextent[0]) * gram_X)), animated=True)
-                gram_ax.set(title='gram')
+                gram_ax.set(title='%u bins per octave' % bins_per_octave)
 
                 # label the x axis for the subplots on the bottom
                 gram_ax.set(xlabel='Frequency (Hz)')
