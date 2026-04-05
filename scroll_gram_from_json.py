@@ -142,14 +142,14 @@ def main():
         if message is None: break
 
         if 'pgram' in message and not 'b' in message:
-            try: pixels = np.asarray(list(base64.b64decode(message['pgram'])))
+            try: pixels = base64.b64decode(message['pgram'])
             except: continue
 
             chigh = 0
             cstep = 0.75
             clow = chigh - 256.0 * cstep
 
-            spl_dB = np.array([q * cstep + clow for q in pixels])
+            spl_dB = np.frombuffer(pixels, dtype=np.uint8) * cstep + clow
 
             if not gram_X:
                 gram_X = spl_dB.shape[0]
