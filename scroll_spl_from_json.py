@@ -131,7 +131,7 @@ def main():
             ax = fig.add_subplot(1, 1, 1)
 
             xextent = [-0.5, X - 0.5]
-            yextent = [0, dt * Y]
+            yextent = [-0.5 * dt, (Y - 0.5) * dt]
 
             im = ax.imshow(plotdata[0:Y, :, :],
                 interpolation='nearest',

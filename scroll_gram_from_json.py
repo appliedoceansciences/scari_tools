@@ -171,7 +171,7 @@ def main():
                 gram_ax = fig.add_subplot(1, 1, 1)
 
                 xextent = [-0.5, gram_X - 0.5]
-                yextent = [0, dt * Y]
+                yextent = [-0.5 * dt, (Y - 0.5) * dt]
 
                 gram_im = gram_ax.imshow(gram_ring[0:Y, :, :],
                     interpolation='nearest',
