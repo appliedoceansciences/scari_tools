@@ -135,6 +135,9 @@ def main():
 
             ax.set(ylabel='Band power (dB re uPa$^2$)')
 
+            ax.grid(True, which='major')
+            ax.grid(True, which='minor', alpha=0.5)
+
             fig.show()
         else:
             # if not the first call, sanity check that X has not changed
