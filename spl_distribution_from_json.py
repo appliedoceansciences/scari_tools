@@ -87,10 +87,6 @@ def main():
         print('assuming scari v1 default calibration, specify full scale square wave dB re uPa^2 using "full_scale" to override', file=sys.stderr)
         full_scale_square_wave_dB_re_uPa_squared = 185.642
 
-
-    # constants you might want to fiddle with. TODO: allow main() to modify these
-    clim=(-123, -3)
-
     # create an empty figure but don't show it yet
     fig = plt.figure()
 
