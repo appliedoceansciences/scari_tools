@@ -77,7 +77,16 @@ def main():
     lines = []
     bin_centres = None
     iband_start = None
-    full_scale_square_wave_dB_re_uPa_squared = 185.642
+    full_scale_square_wave_dB_re_uPa_squared = None
+
+    # loop over pairs of arguments
+    for key, value in zip(sys.argv[1::2], sys.argv[2::2]):
+        if key == 'full_scale': full_scale_square_wave_dB_re_uPa_squared = float(value)
+
+    if full_scale_square_wave_dB_re_uPa_squared is None:
+        print('assuming scari v1 default calibration, specify full scale square wave dB re uPa^2 using "full_scale" to override', file=sys.stderr)
+        full_scale_square_wave_dB_re_uPa_squared = 185.642
+
 
     # constants you might want to fiddle with. TODO: allow main() to modify these
     clim=(-123, -3)
