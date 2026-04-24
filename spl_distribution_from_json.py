@@ -134,6 +134,8 @@ def main():
             linedata = spls_dB[:, (np.arange(5, 105, 10) * T) // 100]
             lines = ax.plot(bin_centres, linedata, color='black', alpha=0.2)
 
+            nowline, = ax.plot(bin_centres, spls_dB, color='red')
+
             # label the x axis for the subplots on the bottom
             ax.set(xlabel='Frequency (Hz)')
             ax.set_xscale('log')
@@ -162,6 +164,8 @@ def main():
             for ipercentile in range(10):
                 lines[ipercentile].set_ydata(linedata[:, ipercentile])
 
+            nowline.set_ydata(spls_dB)
+
         ax.set(title='Distribution of %.0f s decidecade band SPLs for %.0f s' % (float(message['dt']), T * float(message['dt'])))
 
         fig.canvas.draw()
@@ -169,6 +173,9 @@ def main():
 
     # if we get here, we got to eof on stdin
     pth.join()
+
+    # remove "live" line when incoming data ends
+    nowline.remove()
 
 main()
 
