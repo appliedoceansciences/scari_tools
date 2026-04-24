@@ -133,7 +133,7 @@ def main():
             ax.set(xlabel='Frequency (Hz)')
             ax.set_xscale('log')
 
-            ax.set(ylabel='Band power (dB re uPa$^2$)')
+            ax.set(ylabel='Band power (dB re uPa$^2$), 5th-95th percentiles')
 
             ax.grid(True, which='major')
             ax.grid(True, which='minor', alpha=0.5)
@@ -157,7 +157,7 @@ def main():
             for ipercentile in range(10):
                 lines[ipercentile].set_ydata(linedata[:, ipercentile])
 
-        ax.set(title='Distributions (5th-95th pct) of %.0f s avg decidecade band SPL over %.0f s' % (float(message['dt']), T * float(message['dt'])))
+        ax.set(title='Distribution of %.0f s decidecade band SPLs for %.0f s' % (float(message['dt']), T * float(message['dt'])))
 
         fig.canvas.draw()
         fig.canvas.flush_events()
