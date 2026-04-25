@@ -20,6 +20,9 @@ import matplotlib.pyplot as plt
 def frequency_given_bin_index(index, iband_start):
     return math.pow(10.0, (index + iband_start) / 10.0)
 
+def bandwidth_given_bin_index(index, iband_start):
+    return math.pow(10.0, (index + iband_start + 0.5) / 10.0) - math.pow(10.0, (index + iband_start - 0.5) / 10.0)
+
 def bin_index_given_frequency(frequency, iband_start):
     return 10.0 * math.log10(frequency) - iband_start
 
@@ -77,11 +80,15 @@ def main():
     lines = []
     bin_centres = None
     iband_start = None
+    bandwidths = None
+
     full_scale_square_wave_dB_re_uPa_squared = None
+    per_Hz = True
 
     # loop over pairs of arguments
     for key, value in zip(sys.argv[1::2], sys.argv[2::2]):
         if key == 'full_scale': full_scale_square_wave_dB_re_uPa_squared = float(value)
+        if key == 'per_Hz': per_Hz = bool(value)
 
     if full_scale_square_wave_dB_re_uPa_squared is None:
         print('assuming scari v1 default calibration, specify full scale square wave dB re uPa^2 using "full_scale" to override', file=sys.stderr)
@@ -118,13 +125,18 @@ def main():
             fig.clf()
             ax = None
 
+        iband_start = iband_start_this
+        X = spls_dB.shape[0]
+
+        if not bin_centres:
+            bin_centres = [frequency_given_bin_index(x, iband_start) for x in range(X)]
+            bandwidths = [bandwidth_given_bin_index(x, iband_start) for x in range(X)]
+
+        if per_Hz:
+            spls_dB = 10.0 * np.log10(np.pow(10.0, spls_dB / 10.0) / bandwidths)
+
         # do this setup stuff on the first input
         if not ax:
-            X = spls_dB.shape[0]
-            iband_start = iband_start_this
-
-            bin_centres = [frequency_given_bin_index(x, iband_start) for x in range(X)]
-
             ax = fig.add_subplot(1, 1, 1)
 
             data = spls_dB
@@ -140,7 +152,7 @@ def main():
             ax.set(xlabel='Frequency (Hz)')
             ax.set_xscale('log')
 
-            ax.set(ylabel='Band power (dB re uPa$^2$), 5th-95th percentiles')
+            ax.set(ylabel='Band power (dB re uPa$^2$%s), 5th-95th percentiles' % ('/Hz' if per_Hz else ''))
 
             ax.grid(True, which='major')
             ax.grid(True, which='minor', alpha=0.5)
@@ -166,7 +178,7 @@ def main():
 
             nowline.set_ydata(spls_dB)
 
-        ax.set(title='Distribution of %.0f s decidecade band SPLs for %.0f s' % (float(message['dt']), T * float(message['dt'])))
+        ax.set(title='Distribution of %.0f s decidecade %s for %.0f s' % (float(message['dt']), 'noise power' if per_Hz else 'band SPL', T * float(message['dt'])))
 
         fig.canvas.draw()
         fig.canvas.flush_events()
