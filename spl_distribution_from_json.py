@@ -122,9 +122,9 @@ def main():
 
         iband_start_this = int(message['iband_start'])
 
-        if ax and (spls_dB.shape[0] != X or iband_start != iband_start_this):
-            fig.clf()
-            ax = None
+        if X and (spls_dB.shape[0] != X or iband_start != iband_start_this):
+            raise RuntimeError('incoming data has changed parameters')
+            break
 
         iband_start = iband_start_this
         X = spls_dB.shape[0]
@@ -158,10 +158,6 @@ def main():
 
             fig.show()
         else:
-            # if not the first call, sanity check that X has not changed
-            if spls_dB.shape[0] != X:
-                raise RuntimeError('consecutive packets have different numbers of bins (%u != %u)' % spls_dB.shape[0], X)
-
             olddata = data
             data = np.zeros((X, T + 1))
 
