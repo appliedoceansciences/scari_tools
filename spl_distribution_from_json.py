@@ -84,11 +84,14 @@ def main():
 
     full_scale_square_wave_uPa = None
 
+    do_input_voltage_noise = False
+
     # loop over pairs of arguments
     for key, value in zip(sys.argv[1::2], sys.argv[2::2]):
         if key == 'hydrophone_sensitivity': hydrophone_volt_per_uPa = math.sqrt(math.pow(10.0, float(value) / 10.0))
         if key == 'preamp_gain': preamp_voltage_gain = math.sqrt(math.pow(10.0, float(value) / 10.0))
         if key == 'full_scale': full_scale_square_wave_uPa = math.sqrt(math.pow(10.0, float(value) / 10.0))
+        if key == 'input_voltage_noise': do_input_voltage_noise = bool(value)
 
     if full_scale_square_wave_uPa is None:
         full_scale_square_wave_uPa = full_scale_zero_to_peak_volts / (hydrophone_volt_per_uPa * preamp_voltage_gain)
@@ -147,7 +150,12 @@ def main():
             bin_centres = [frequency_given_bin_index(x, iband_start) for x in range(X)]
             bandwidths = [bandwidth_given_bin_index(x, iband_start) for x in range(X)]
 
-        new_data = 10.0 * np.log10(np.pow(10.0, spls_dB / 10.0) / bandwidths)
+        if do_input_voltage_noise:
+            new_data = 1e9 * np.sqrt(np.pow(10.0, spls_dB / 10.0) / bandwidths) * hydrophone_volt_per_uPa
+            y_unit = 'nV/$\sqrt{Hz}$'
+        else:
+            new_data = 10.0 * np.log10(np.pow(10.0, spls_dB / 10.0) / bandwidths)
+            y_unit = 'dB re uPa$^2$/Hz'
 
         if data is None:
             data = np.reshape(new_data, (X, 1))
@@ -174,7 +182,7 @@ def main():
             ax.set(xlabel='Frequency (Hz)')
             ax.set_xscale('log')
 
-            ax.set(ylabel='Band power (dB re uPa$^2/Hz), 5th-95th percentiles')
+            ax.set(ylabel='Band power (%s), 5th-95th percentiles' % y_unit)
 
             ax.grid(True, which='major')
             ax.grid(True, which='minor', alpha=0.5)
