@@ -153,9 +153,11 @@ def main():
         if do_input_voltage_noise:
             new_data = 1e9 * np.sqrt(np.pow(10.0, spls_dB / 10.0) / bandwidths) * hydrophone_volt_per_uPa
             y_unit = 'nV/$\sqrt{Hz}$'
+            title_unit = 'input voltage noise density'
         else:
             new_data = 10.0 * np.log10(np.pow(10.0, spls_dB / 10.0) / bandwidths)
             y_unit = 'dB re uPa$^2$/Hz'
+            title_unit = '%.0f s decidecade noise power density' % float(message['dt'])
 
         if data is None:
             data = np.reshape(new_data, (X, 1))
@@ -192,7 +194,7 @@ def main():
             for ipercentile in range(10):
                 lines[ipercentile].set_ydata(linedata[:, ipercentile])
 
-        ax.set(title='Distribution of %.0f s decidecade noise power for %.0f s' % (float(message['dt']), T * float(message['dt'])))
+        ax.set(title='Distribution of %s for %.0f s' % (title_unit, T * float(message['dt'])))
 
         if nowline is not None:
             nowline.remove()
