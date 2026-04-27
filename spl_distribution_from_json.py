@@ -86,12 +86,15 @@ def main():
 
     do_input_voltage_noise = False
 
+    extra_title = None
+
     # loop over pairs of arguments
     for key, value in zip(sys.argv[1::2], sys.argv[2::2]):
         if key == 'hydrophone_sensitivity': hydrophone_volt_per_uPa = math.sqrt(math.pow(10.0, float(value) / 10.0))
         if key == 'preamp_gain': preamp_voltage_gain = math.sqrt(math.pow(10.0, float(value) / 10.0))
         if key == 'full_scale': full_scale_square_wave_uPa = math.sqrt(math.pow(10.0, float(value) / 10.0))
         if key == 'input_voltage_noise': do_input_voltage_noise = bool(value)
+        if key == 'title': extra_title = value
 
     if full_scale_square_wave_uPa is None:
         full_scale_square_wave_uPa = full_scale_zero_to_peak_volts / (hydrophone_volt_per_uPa * preamp_voltage_gain)
@@ -194,7 +197,10 @@ def main():
             for ipercentile in range(10):
                 lines[ipercentile].set_ydata(linedata[:, ipercentile])
 
-        ax.set(title='Distribution of %s for %.0f s' % (title_unit, T * float(message['dt'])))
+        title = 'Distribution of %s for %.0f s' % (title_unit, T * float(message['dt']))
+        if extra_title:
+            title = extra_title + '\n' + title
+        ax.set(title=title)
 
         if nowline is not None:
             nowline.remove()
