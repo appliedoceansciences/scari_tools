@@ -149,11 +149,10 @@ def main():
             bin_centres = [frequency_given_bin_index(x, iband_start) for x in range(X)]
             bandwidths = [bandwidth_given_bin_index(x, iband_start) for x in range(X)]
 
-        if per_Hz:
-            spls_dB = 10.0 * np.log10(np.pow(10.0, spls_dB / 10.0) / bandwidths)
+        new_data = 10.0 * np.log10(np.pow(10.0, spls_dB / 10.0) / bandwidths) if per_Hz else spls_dB
 
         if data is None:
-            data = np.reshape(spls_dB, (X, 1))
+            data = np.reshape(new_data, (X, 1))
             T = 1
         else:
             olddata = data
@@ -161,7 +160,7 @@ def main():
 
             for iband in range(X):
                 prior = olddata[iband, 0:T]
-                data[iband, :] = np.insert(prior, np.searchsorted(prior, spls_dB[iband]), spls_dB[iband])
+                data[iband, :] = np.insert(prior, np.searchsorted(prior, new_data[iband]), new_data[iband])
 
             T += 1
 
@@ -195,7 +194,7 @@ def main():
         ax.relim()
         ax.autoscale_view()
 
-        nowline, = ax.plot(bin_centres, spls_dB, color='red')
+        nowline, = ax.plot(bin_centres, new_data, color='red')
 
         fig.canvas.draw()
         fig.canvas.flush_events()
