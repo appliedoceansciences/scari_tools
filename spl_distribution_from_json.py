@@ -77,7 +77,7 @@ def main():
     full_scale_zero_to_peak_volts = 3.0
 
     # property of hydrophone, given as -202.5 dB re V^2/uPa^2
-    hydrophone_uPa_per_volt = math.sqrt(math.pow(10.0, -202.5 / 10.0))
+    hydrophone_volt_per_uPa = math.sqrt(math.pow(10.0, -202.5 / 10.0))
 
     # ratio of voltages, not in dB
     preamp_voltage_gain = 21.0
@@ -86,14 +86,14 @@ def main():
 
     # loop over pairs of arguments
     for key, value in zip(sys.argv[1::2], sys.argv[2::2]):
-        if key == 'hydrophone_sensitivity': hydrophone_uPa_per_volt = math.sqrt(math.pow(10.0, float(value) / 10.0))
+        if key == 'hydrophone_sensitivity': hydrophone_volt_per_uPa = math.sqrt(math.pow(10.0, float(value) / 10.0))
         if key == 'preamp_gain': preamp_voltage_gain = math.sqrt(math.pow(10.0, float(value) / 10.0))
         if key == 'full_scale': full_scale_square_wave_uPa = math.sqrt(math.pow(10.0, float(value) / 10.0))
 
     if full_scale_square_wave_uPa is None:
-        full_scale_square_wave_uPa = full_scale_zero_to_peak_volts / (hydrophone_uPa_per_volt * preamp_voltage_gain)
+        full_scale_square_wave_uPa = full_scale_zero_to_peak_volts / (hydrophone_volt_per_uPa * preamp_voltage_gain)
     else:
-        preamp_voltage_gain = full_scale_zero_to_peak_volts / (hydrophone_uPa_per_volt * full_scale_square_wave_uPa)
+        preamp_voltage_gain = full_scale_zero_to_peak_volts / (hydrophone_volt_per_uPa * full_scale_square_wave_uPa)
         print('assuming preamp gain is %g dB' % (10.0 * math.log10(preamp_voltage_gain * preamp_voltage_gain)), file=sys.stderr)
 
     full_scale_square_wave_dB_re_uPa_squared = 10.0 * math.log10(full_scale_square_wave_uPa * full_scale_square_wave_uPa)
