@@ -73,16 +73,6 @@ def parse_scari_pspl_data_segment(base64_string):
     return spls_dB
 
 def main():
-    data = None
-    X = 0
-    T = 0
-    ax = None
-    lines = []
-    bin_centres = None
-    iband_start = None
-    bandwidths = None
-    nowline = None
-
     # differential adc input can swing from -3.0 to +3.0 volts
     full_scale_zero_to_peak_volts = 3.0
 
@@ -110,6 +100,16 @@ def main():
 
     full_scale_square_wave_dB_re_uPa_squared = 10.0 * math.log10(full_scale_square_wave_uPa * full_scale_square_wave_uPa)
     print('full scale square wave is %g dB re uPa^2' % full_scale_square_wave_dB_re_uPa_squared, file=sys.stderr)
+
+    data = None
+    X = 0
+    T = 0
+    ax = None
+    lines = []
+    bin_centres = None
+    iband_start = None
+    bandwidths = None
+    nowline = None
 
     # create an empty figure but don't show it yet
     fig = plt.figure()
