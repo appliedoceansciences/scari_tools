@@ -136,15 +136,25 @@ def main():
         if per_Hz:
             spls_dB = 10.0 * np.log10(np.pow(10.0, spls_dB / 10.0) / bandwidths)
 
-        # do this setup stuff on the first input
+        if data is None:
+            data = np.reshape(spls_dB, (X, 1))
+            T = 1
+        else:
+            olddata = data
+            data = np.zeros((X, T + 1))
+
+            for iband in range(X):
+                prior = olddata[iband, 0:T]
+                data[iband, :] = np.insert(prior, np.searchsorted(prior, spls_dB[iband]), spls_dB[iband])
+
+            T += 1
+
+        linedata = data[:, (np.arange(5, 105, 10) * T) // 100]
+
+        # create plot on first input
         if not ax:
             ax = fig.add_subplot(1, 1, 1)
 
-            data = spls_dB
-            data.shape = [X, 1]
-            T = 1
-
-            linedata = spls_dB[:, (np.arange(5, 105, 10) * T) // 100]
             lines = ax.plot(bin_centres, linedata, color='black', alpha=0.2)
 
             # label the x axis for the subplots on the bottom
@@ -158,16 +168,6 @@ def main():
 
             fig.show()
         else:
-            olddata = data
-            data = np.zeros((X, T + 1))
-
-            for iband in range(X):
-                prior = olddata[iband, 0:T]
-                data[iband, :] = np.insert(prior, np.searchsorted(prior, spls_dB[iband]), spls_dB[iband])
-
-            T += 1
-            linedata = data[:, (np.arange(5, 105, 10) * T) // 100]
-
             for ipercentile in range(10):
                 lines[ipercentile].set_ydata(linedata[:, ipercentile])
 
