@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-# usage: ./gpzda.py /dev/tty.usbserial-XXXXX 115200"
+# usage: ./gpzda_to_daq.py /dev/tty.usbserial-XXXXX 115200"
 
 # copyright 2024- applied ocean sciences
 # isc license
 # point of contact: richard campbell
 
 from datetime import datetime, timezone
+import os
 import sys
 from math import floor
 
@@ -36,4 +37,19 @@ time.sleep(0.1)
 
 create_and_send_one_gpzda_packet(ser)
 
-ser.close()
+# every ten seconds
+interval_ns = 10000000000
+
+fd = os.timerfd_create(time.CLOCK_REALTIME)
+
+now_ns = time.clock_gettime_ns(time.CLOCK_REALTIME)
+
+# at least half an interval in the future, aligned with one interval in absolute time
+time_in_future_ns = ((now_ns + interval_ns // 2 + interval_ns - 1) // interval_ns) * interval_ns
+
+os.timerfd_settime_ns(fd, initial=time_in_future_ns, interval=interval_ns, flags=os.TFD_TIMER_ABSTIME)
+
+while True:
+    _ = os.read(fd, 8)
+    now_ns = time.clock_gettime(time.CLOCK_REALTIME)
+    create_and_send_one_gpzda_packet(ser)

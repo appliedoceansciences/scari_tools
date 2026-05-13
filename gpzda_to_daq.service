@@ -1,0 +1,9 @@
+[Unit]
+Description=gpzda to daq
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/gpzda_to_daq.py /dev/ttyAMA0 115200
+
+[Install]
+WantedBy=multi-user.target
