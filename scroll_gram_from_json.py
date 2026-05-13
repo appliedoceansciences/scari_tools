@@ -122,6 +122,10 @@ def main():
 
     gram_clim=(-120, -30)
 
+    # loop over pairs of arguments
+    for key, value in zip(sys.argv[1::2], sys.argv[2::2]):
+        if key == 'climit': gram_clim = [float(x) for x in value.split(',', 1)]
+
     # create an empty figure but don't show it yet
     fig = plt.figure()
 

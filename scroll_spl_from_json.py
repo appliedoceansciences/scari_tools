@@ -84,6 +84,10 @@ def main():
     # constants you might want to fiddle with. TODO: allow main() to modify these
     clim=(-123, -3)
 
+    # loop over pairs of arguments
+    for key, value in zip(sys.argv[1::2], sys.argv[2::2]):
+        if key == 'climit': clim = [float(x) for x in value.split(',', 1)]
+
     # create an empty figure but don't show it yet
     fig = plt.figure()
 
