@@ -51,5 +51,4 @@ os.timerfd_settime_ns(fd, initial=time_in_future_ns, interval=interval_ns, flags
 
 while True:
     _ = os.read(fd, 8)
-    now_ns = time.clock_gettime(time.CLOCK_REALTIME)
     create_and_send_one_gpzda_packet(ser)
