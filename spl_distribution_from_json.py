@@ -88,6 +88,8 @@ def main():
 
     extra_title = None
 
+    data_to_overplot = None
+
     # loop over pairs of arguments
     for key, value in zip(sys.argv[1::2], sys.argv[2::2]):
         if key == 'hydrophone_sensitivity': hydrophone_volt_per_uPa = math.sqrt(math.pow(10.0, float(value) / 10.0))
@@ -95,6 +97,7 @@ def main():
         if key == 'full_scale': full_scale_square_wave_uPa = math.sqrt(math.pow(10.0, float(value) / 10.0))
         if key == 'input_voltage_noise': do_input_voltage_noise = bool(value)
         if key == 'title': extra_title = value
+        if key == 'data_to_overplot': data_to_overplot = np.loadtxt(open(value, 'r'), delimiter=',', comments=['#', ';'])
 
     if full_scale_square_wave_uPa is None:
         full_scale_square_wave_uPa = full_scale_zero_to_peak_volts / (hydrophone_volt_per_uPa * preamp_voltage_gain)
@@ -218,6 +221,11 @@ def main():
 
     # remove "live" line when incoming data ends
     nowline.remove()
+
+    if data_to_overplot is not None:
+        if 1 == len(data_to_overplot.shape):
+            data_to_overplot.shape = (1, data_to_overplot.shape[0])
+        ax.plot(data_to_overplot[:, 0], data_to_overplot[:, 1])
 
 main()
 
