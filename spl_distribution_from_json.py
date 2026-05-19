@@ -89,6 +89,7 @@ def main():
     extra_title = None
 
     data_to_overplot = None
+    ytick = None
 
     # loop over pairs of arguments
     for key, value in zip(sys.argv[1::2], sys.argv[2::2]):
@@ -97,6 +98,7 @@ def main():
         if key == 'full_scale': full_scale_square_wave_uPa = math.sqrt(math.pow(10.0, float(value) / 10.0))
         if key == 'input_voltage_noise': do_input_voltage_noise = bool(value)
         if key == 'title': extra_title = value
+        if key == 'ytick': ytick = float(value)
         if key == 'data_to_overplot': data_to_overplot = np.loadtxt(open(value, 'r'), delimiter=',', comments=['#', ';'])
 
     if full_scale_square_wave_uPa is None:
@@ -194,6 +196,7 @@ def main():
 
             ax.grid(True, which='major')
             ax.grid(True, which='minor', alpha=0.5)
+            if ytick: ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(ytick));
 
             fig.show()
         else:
