@@ -120,7 +120,7 @@ def main():
     df_prior = None
     bins_per_octave_prior = None
 
-    gram_clim=(-120, -30)
+    gram_clim=(-130, -40)
 
     # loop over pairs of arguments
     for key, value in zip(sys.argv[1::2], sys.argv[2::2]):
