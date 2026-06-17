@@ -70,9 +70,9 @@ def main():
     sys.stdin.reconfigure(errors='ignore')
 
     for line in sys.stdin:
-        if not '$' in line: continue
-
         print(line.strip(), file=sys.stderr)
+
+        if not '$' in line: continue
 
         # hack to ignore things on the line before the leading $ in demo code
         if not line.startswith('$'):
