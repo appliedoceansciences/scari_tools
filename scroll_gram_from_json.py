@@ -120,11 +120,19 @@ def main():
     df_prior = None
     bins_per_octave_prior = None
 
-    gram_clim=(-130, -40)
+    gram_clim = None
+    divide_by_bandwidth = False
 
     # loop over pairs of arguments
     for key, value in zip(sys.argv[1::2], sys.argv[2::2]):
         if key == 'climit': gram_clim = [float(x) for x in value.split(',', 1)]
+        if key == 'divide_by_bandwidth': divide_by_bandwidth = bool(value)
+
+    if gram_clim is None:
+        if divide_by_bandwidth:
+            gram_clim=(-150, -60)
+        else:
+            gram_clim=(-130, -40)
 
     # create an empty figure but don't show it yet
     fig = plt.figure()
@@ -186,7 +194,11 @@ def main():
                 # override an expensive method inside matplotlib that tries to do too much
                 gram_im._make_image = _make_image_override.__get__(gram_im, matplotlib.image.AxesImage)
 
-                gram_ax.set(title='%u bins per octave' % bins_per_octave)
+                title = '%u bins per octave' % bins_per_octave
+                if divide_by_bandwidth:
+                    title = title + ', divided by bandwidth'
+
+                gram_ax.set(title=title)
 
                 # label the x axis for the subplots on the bottom
                 gram_ax.set(xlabel='Frequency (Hz)')
@@ -212,6 +224,21 @@ def main():
             dt_prior = dt
             df_prior = df
             bins_per_octave_prior = bins_per_octave
+
+            if divide_by_bandwidth:
+                dlogf = math.log(2.0) / bins_per_octave
+
+                spl = np.pow(10.0, spl_dB * 0.1)
+                spl[:] /= (1.5 * df)
+
+                log_bins = gram_X - (linear_bins_from_dc - 2)
+
+                for ibin in range(log_bins):
+                    # midpoint, in input frequency bins from dc, of this output bin
+                    iwf_mid = linear_bins_from_dc * pow(2, ibin / bins_per_octave)
+                    local_band_spacing_in_bins = iwf_mid * dlogf
+                    spl[ibin + linear_bins_from_dc - 2] /= local_band_spacing_in_bins
+                spl_dB = 10.0 * np.log10(spl)
 
             # convert the values in intensity for the new row of pixels to rgba values
             bins_rgba = gram_to_rgba_func(np.clip((spl_dB - gram_clim[0]) / (gram_clim[1] - gram_clim[0]), 0, 1), bytes=True, norm=False)
