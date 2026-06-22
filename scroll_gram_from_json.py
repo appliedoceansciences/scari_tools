@@ -226,19 +226,13 @@ def main():
             bins_per_octave_prior = bins_per_octave
 
             if divide_by_bandwidth:
-                dlogf = math.log(2.0) / bins_per_octave
+                spl_per_Hz = np.pow(10.0, spl_dB * 0.1) / (1.5 * df)
 
-                spl = np.pow(10.0, spl_dB * 0.1)
-                spl[:] /= (1.5 * df)
-
-                log_bins = gram_X - (linear_bins_from_dc - 2)
-
-                for ibin in range(log_bins):
-                    # midpoint, in input frequency bins from dc, of this output bin
+                for ibin in range(gram_X - (linear_bins_from_dc - 2)):
                     iwf_mid = linear_bins_from_dc * pow(2, ibin / bins_per_octave)
-                    local_band_spacing_in_bins = iwf_mid * dlogf
-                    spl[ibin + linear_bins_from_dc - 2] /= local_band_spacing_in_bins
-                spl_dB = 10.0 * np.log10(spl)
+                    local_band_spacing_in_bins = iwf_mid * math.log(2.0) / bins_per_octave
+                    spl_per_Hz[ibin + linear_bins_from_dc - 2] /= local_band_spacing_in_bins
+                spl_dB = 10.0 * np.log10(spl_per_Hz)
 
             # convert the values in intensity for the new row of pixels to rgba values
             bins_rgba = gram_to_rgba_func(np.clip((spl_dB - gram_clim[0]) / (gram_clim[1] - gram_clim[0]), 0, 1), bytes=True, norm=False)
