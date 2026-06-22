@@ -203,6 +203,8 @@ def main():
                 # label the x axis for the subplots on the bottom
                 gram_ax.set(xlabel='Frequency (Hz)')
 
+                gram_ax.set(ylabel='Time (s) in past')
+
                 # TODO: figure out how to set this programmatically
                 tick_positions_Hz = [ 50, 100, 150, 200, 300, 400, 500, 600, 800, 1000, 1500, 2000, 3000, 4000, 5000, 6000, 8000, 10000, 15000, 20000, 30000]
                 while tick_positions_Hz[0] < bin_centres[0] - 0.5 * df: tick_positions_Hz = tick_positions_Hz[1:]
