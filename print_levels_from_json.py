@@ -28,5 +28,6 @@ def main():
             spl_dB = np.frombuffer(pixels, dtype=np.uint8) * cstep + clow + full_scale
 
             np.savetxt(sys.stdout, np.expand_dims(spl_dB, axis=0), fmt='%.1f', delimiter=', ')
+            sys.stdout.flush()
 
 main()
