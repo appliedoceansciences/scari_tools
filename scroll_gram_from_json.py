@@ -122,11 +122,13 @@ def main():
 
     gram_clim = None
     divide_by_bandwidth = False
+    title = None
 
     # loop over pairs of arguments
     for key, value in zip(sys.argv[1::2], sys.argv[2::2]):
         if key == 'climit': gram_clim = [float(x) for x in value.split(',', 1)]
         if key == 'divide_by_bandwidth': divide_by_bandwidth = bool(value)
+        if key == 'title': title = value
 
     if gram_clim is None:
         if divide_by_bandwidth:
@@ -136,6 +138,9 @@ def main():
 
     # create an empty figure but don't show it yet
     fig = plt.figure()
+    if title is not None:
+        fig.suptitle(title)
+        fig.canvas.manager.set_window_title(title)
 
     fig.canvas.mpl_connect('close_event', on_close)
 
