@@ -5,6 +5,7 @@ import threading
 import queue
 import json
 import math
+import argparse
 import numpy as np
 
 import matplotlib
@@ -81,12 +82,11 @@ def main():
     bin_centres = None
     iband_start = None
 
-    # constants you might want to fiddle with. TODO: allow main() to modify these
-    clim=(-123, -3)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--climit', default=None, help='Comma-separated pair of lower and upper limits of colormap')
+    a = parser.parse_args()
 
-    # loop over pairs of arguments
-    for key, value in zip(sys.argv[1::2], sys.argv[2::2]):
-        if key == 'climit': clim = [float(x) for x in value.split(',', 1)]
+    gram_clim = [float(x) for x in value.split(',', 1)] if a.climit else (-123, -3)
 
     # create an empty figure but don't show it yet
     fig = plt.figure()

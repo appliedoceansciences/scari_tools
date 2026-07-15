@@ -5,6 +5,7 @@ import threading
 import queue
 import json
 import math
+import argparse
 import numpy as np
 
 import matplotlib
@@ -76,30 +77,21 @@ def main():
     # differential adc input can swing from -3.0 to +3.0 volts
     full_scale_zero_to_peak_volts = 3.0
 
-    # property of hydrophone, given as -202.5 dB re V^2/uPa^2
-    hydrophone_volt_per_uPa = math.sqrt(math.pow(10.0, -202.5 / 10.0))
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--hydrophone_sensitivity', default=-202.5, type=float, help='Hydrophone sensitivity in dB re V^2/uPa^2')
+    parser.add_argument('--preamp_gain', default=26.4444, type=float, help='Preamp gain in dB')
+    parser.add_argument('--full_scale', default=None, help='Magnitude of a full-scale square wave in uPa')
+    parser.add_argument('--input_voltage_noise', action='store_true', help='If true, plot voltage noise in nV^2/Hz')
+    parser.add_argument('--title', default=None, help='Plot title')
+    parser.add_argument('--ytick', default=None, type=float)
+    parser.add_argument('--data_to_overplot', default=None)
+    a = parser.parse_args()
 
-    # ratio of voltages, not in dB
-    preamp_voltage_gain = 21.0
-
-    full_scale_square_wave_uPa = None
-
-    do_input_voltage_noise = False
-
-    extra_title = None
-
-    data_to_overplot = None
-    ytick = None
-
-    # loop over pairs of arguments
-    for key, value in zip(sys.argv[1::2], sys.argv[2::2]):
-        if key == 'hydrophone_sensitivity': hydrophone_volt_per_uPa = math.sqrt(math.pow(10.0, float(value) / 10.0))
-        if key == 'preamp_gain': preamp_voltage_gain = math.sqrt(math.pow(10.0, float(value) / 10.0))
-        if key == 'full_scale': full_scale_square_wave_uPa = math.sqrt(math.pow(10.0, float(value) / 10.0))
-        if key == 'input_voltage_noise': do_input_voltage_noise = bool(value)
-        if key == 'title': extra_title = value
-        if key == 'ytick': ytick = float(value)
-        if key == 'data_to_overplot': data_to_overplot = np.loadtxt(open(value, 'r'), delimiter=',', comments=['#', ';'])
+    hydrophone_volt_per_uPa = math.sqrt(math.pow(10.0, float(a.hydrophone_sensitivity) / 10.0))
+    full_scale_square_wave_uPa = math.sqrt(math.pow(10.0, float(a.full_scale) / 10.0)) if a.full_scale else None
+    preamp_voltage_gain = math.sqrt(math.pow(10.0, float(a.preamp_gain) / 10.0)) if a.preamp_gain else None
+    data_to_overplot = np.loadtxt(open(value, 'r'), delimiter=',', comments=['#', ';']) if a.data_to_overplot else None
+    do_input_voltage_noise, extra_title, ytick = a.input_voltage_noise, a.title, a.ytick
 
     if full_scale_square_wave_uPa is None:
         full_scale_square_wave_uPa = full_scale_zero_to_peak_volts / (hydrophone_volt_per_uPa * preamp_voltage_gain)

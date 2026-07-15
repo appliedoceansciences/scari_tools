@@ -5,6 +5,7 @@ import threading
 import queue
 import json
 import math
+import argparse
 import numpy as np
 
 import matplotlib
@@ -120,15 +121,14 @@ def main():
     df_prior = None
     bins_per_octave_prior = None
 
-    gram_clim = None
-    divide_by_bandwidth = False
-    title = None
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--climit', default=None, help='Comma-separated pair of lower and upper limits of colormap')
+    parser.add_argument('--divide_by_bandwidth', action='store_true', help='Whether to plot dB relative to power, or relative to power per Hz')
+    parser.add_argument('--title', default=None, help='Plot title')
+    a = parser.parse_args()
 
-    # loop over pairs of arguments
-    for key, value in zip(sys.argv[1::2], sys.argv[2::2]):
-        if key == 'climit': gram_clim = [float(x) for x in value.split(',', 1)]
-        if key == 'divide_by_bandwidth': divide_by_bandwidth = bool(value)
-        if key == 'title': title = value
+    divide_by_bandwidth, title = a.divide_by_bandwidth, a.title
+    gram_clim = [float(x) for x in value.split(',', 1)] if a.climit else None
 
     if gram_clim is None:
         if divide_by_bandwidth:
