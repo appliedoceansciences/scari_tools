@@ -6,7 +6,7 @@ This repository contains a number of scripts useful for working with SCARI outpu
 
 - `scari_uart_to_json.py`: Opens a `/dev/ttyXXXX` serial device, which may be a physical UART directly attached to SCARI, or a USB CDC serial debug device further downstream to which the SCARI output has been forwarded. For each valid `$PSPL` and `$PGRAM` NMEA-like message read on the UART input, a newline-delimited JSON message is emitted on stdout, suitable for piping into one of several visualization or postprocessing routines, either locally or at the far end of an SSH pipe, for example.
 
-- `scroll_gram_from_json.py`: Reads the newline-delimited JSON emitted by the above, or by `shm2pgram.py` in the scrollygram repository, and plots a live-scrolling spectrogram from the PGRAM messages. When run locally and ingesting input from a remote source of JSON lines via SSH or other pipe, this allows a live scrolling spectrogram to be viewed over limited-bandwidth connections.
+- `scroll_gram_from_json.py`: Reads the newline-delimited JSON emitted by the above, or by `shm2pgram.py` in the [scrollygram](https://github.com/appliedoceansciences/scrollygram) repository, and plots a live-scrolling spectrogram from the PGRAM messages. When run locally and ingesting input from a remote source of JSON lines via SSH or other pipe, this allows a live scrolling spectrogram to be viewed over limited-bandwidth connections.
 
 - `scroll_spl_from_json.py`: Similar, but for the PSPL messages, which encode only the ANSI decidecade bands.
 
