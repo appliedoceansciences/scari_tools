@@ -83,10 +83,11 @@ def main():
     iband_start = None
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--climit', default=None, help='Comma-separated pair of lower and upper limits of colormap')
+    parser.add_argument('--cfloor', default=-123, type=float, help='Lower bound on colormap')
+    parser.add_argument('--crange', default=120, type=float, help='Range of colormap')
     a = parser.parse_args()
 
-    gram_clim = [float(x) for x in value.split(',', 1)] if a.climit else (-123, -3)
+    clim = (a.cfloor, a.cfloor + a.crange)
 
     # create an empty figure but don't show it yet
     fig = plt.figure()

@@ -122,19 +122,18 @@ def main():
     bins_per_octave_prior = None
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--climit', default=None, help='Comma-separated pair of lower and upper limits of colormap')
+    parser.add_argument('--cfloor', default=None, type=float, help='Lower bound on colormap')
+    parser.add_argument('--crange', default=90, type=float, help='Range of colormap')
     parser.add_argument('--divide_by_bandwidth', action='store_true', help='Whether to plot dB relative to power, or relative to power per Hz')
     parser.add_argument('--title', default=None, help='Plot title')
     a = parser.parse_args()
 
-    divide_by_bandwidth, title = a.divide_by_bandwidth, a.title
-    gram_clim = [float(x) for x in value.split(',', 1)] if a.climit else None
+    cfloor, divide_by_bandwidth, title = a.cfloor, a.divide_by_bandwidth, a.title
 
-    if gram_clim is None:
-        if divide_by_bandwidth:
-            gram_clim=(-150, -60)
-        else:
-            gram_clim=(-130, -40)
+    if cfloor is None:
+        cfloor = -150 if divide_by_bandwidth else -130
+
+    clim = (cfloor, cfloor + a.crange)
 
     # create an empty figure but don't show it yet
     fig = plt.figure()
@@ -242,7 +241,7 @@ def main():
                 spl_dB = 10.0 * np.log10(spl_per_Hz)
 
             # convert the values in intensity for the new row of pixels to rgba values
-            bins_rgba = gram_to_rgba_func(np.clip((spl_dB - gram_clim[0]) / (gram_clim[1] - gram_clim[0]), 0, 1), bytes=True, norm=False)
+            bins_rgba = gram_to_rgba_func(np.clip((spl_dB - clim[0]) / (clim[1] - clim[0]), 0, 1), bytes=True, norm=False)
 
             # advance the ring buffer cursor (decrements w/ wraparound, as newest time is at bottom)
             gram_iy = (gram_iy + Y - 1) % Y
