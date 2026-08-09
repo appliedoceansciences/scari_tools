@@ -98,7 +98,4 @@ def main():
 
             print(json.dumps({ 'time': timestamp, 'dt': float(dt_text), 'iband_start': int(iband_start_text), 'pspl': base64_string }), flush=True)
 
-    if nmea_checksum_errors > 0:
-        print('nmea checksum errors: %u' % nmea_checksum_errors, file=sys.stderr)
-
 main()
