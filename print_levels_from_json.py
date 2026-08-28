@@ -3,13 +3,13 @@ import sys
 import base64
 import json
 import math
-from datetime import datetime
+from datetime import datetime, timestamp
 import numpy as np
 
 def datestr_from_unix_microseconds(microseconds):
     integer_portion = microseconds // 1000000
     remainder = microseconds % 1000000
-    return '%s.%06uZ' % (datetime.utcfromtimestamp(integer_portion).strftime('%Y%m%dT%H%M%S'), remainder)
+    return '%s.%06uZ' % (datetime.fromtimestamp(integer_portion, timestamp.utc).strftime('%Y%m%dT%H%M%S'), remainder)
 
 def bin_index_given_frequency(frequency, df, bins_per_octave):
     linear_bins_from_dc = math.ceil(bins_per_octave / math.log(2))
