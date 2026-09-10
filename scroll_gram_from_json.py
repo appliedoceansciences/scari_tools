@@ -167,13 +167,14 @@ def main():
 
             spl_dB = np.frombuffer(pixels, dtype=np.uint8) * cstep + clow
 
+            # read these from every packet so the elif sanity check below can actually catch a change
+            df = float(message['df'])
+            dt = float(message['dt'])
+            bins_per_octave = int(message['bins_per_octave'])
+
             if not gram_X:
                 gram_X = spl_dB.shape[0]
                 Y = (2 * gram_X) // 3
-
-                df = float(message['df'])
-                dt = float(message['dt'])
-                bins_per_octave = int(message['bins_per_octave'])
 
                 linear_bins_from_dc = math.ceil(bins_per_octave / math.log(2))
                 print('%u total bins' % gram_X, file=sys.stderr)
