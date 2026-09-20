@@ -108,13 +108,21 @@ def _make_image_override(self, A, in_bbox, out_bbox, clip_bbox, magnification=1.
 
     return output, clipped_bbox.x0, clipped_bbox.y0, t
 
+def round_up_to_next_multiple_of(a, q):
+    return a + q - a % q if a % q else a
+
 def main():
     Y = 0
 
-    gram_ring = None
+    C = 0
+    nrows = 0
+    ncols = 0
+    ic_last_seen = None
+
     gram_X = 0
-    gram_ax = None
-    gram_im = None
+    gram_rings = []
+    gram_axes = []
+    gram_ims = []
     gram_iy = 0
 
     dt_prior = None
@@ -169,6 +177,27 @@ def main():
             dt = float(message['dt'])
             bins_per_octave = int(message['bins_per_octave'])
 
+            ic = int(message['channel']) if 'channel' in message else 0
+            if ic >= C:
+                C_prior = C
+                C = ic + 1
+                gram_rings = gram_rings + [None] * (C - C_prior)
+                gram_axes = gram_axes + [None] * (C - C_prior)
+                gram_ims = gram_ims + [None] * (C - C_prior)
+
+                # TODO: figure out a more intelligent way to do this
+                nrows = 1 if C <= 2 else 2 if C <= 8 else 3 if C <= 12 else 4
+                ncols = round_up_to_next_multiple_of(C, nrows) // nrows
+
+                if C_prior > 0:
+                    # rearrange existing subplots
+                    gs = matplotlib.gridspec.GridSpec(nrows, ncols)
+                    for ic_prior in range(C_prior):
+                        if gram_axes[ic_prior]:
+                            gram_axes[ic_prior].set_position(gs[ic_prior].get_position(fig))
+                            gram_axes[ic_prior].set_subplotspec(gs[ic_prior])
+                            gram_axes[ic_prior].set(title='channel %u' % ic_prior)
+
             if not gram_X:
                 gram_X = spl_dB.shape[0]
                 Y = (2 * gram_X) // 3
@@ -180,9 +209,18 @@ def main():
 
                 bin_centres = [frequency_given_bin_index(x, df, bins_per_octave) for x in range(gram_X)]
 
-                gram_ring = np.zeros([2 * Y, gram_X, 4], dtype=np.uint8)
+            if ic_last_seen is None or ic <= ic_last_seen:
+                # advance the ring buffer cursor (decrements w/ wraparound, as newest time is at bottom)
+                gram_iy = (gram_iy + Y - 1) % Y
 
-                gram_ax = fig.add_subplot(1, 1, 1)
+            ic_last_seen = ic
+
+            gram_ring = gram_rings[ic]
+            if gram_ring is None:
+                gram_ring = np.zeros([2 * Y, gram_X, 4], dtype=np.uint8)
+                gram_rings[ic] = gram_ring
+                gram_ax = fig.add_subplot(nrows, ncols, ic + 1)
+                gram_axes[ic] = gram_ax
 
                 xextent = [-0.5, gram_X - 0.5]
                 yextent = [-0.5 * dt, (Y - 0.5) * dt]
@@ -192,10 +230,12 @@ def main():
                     origin='lower',
                     extent=[xextent[0], xextent[1], yextent[0], yextent[1]],
                     aspect=(((xextent[1] - xextent[0]) * Y) / ((yextent[1] - yextent[0]) * gram_X)), animated=True)
-
+                gram_ims[ic] = gram_im
                 # override an expensive method inside matplotlib that tries to do too much
                 gram_im._make_image = _make_image_override.__get__(gram_im, matplotlib.image.AxesImage)
 
+                if C > 1:
+                    gram_ax.set(title='channel %u' % ic)
 
                 # label the x axis for the subplots on the bottom
                 gram_ax.set(xlabel='Frequency (Hz)')
@@ -245,21 +285,19 @@ def main():
             # convert the values in intensity for the new row of pixels to rgba values
             bins_rgba = gram_to_rgba_func(np.clip((spl_dB - clim[0]) / (clim[1] - clim[0]), 0, 1), bytes=True, norm=False)
 
-            # advance the ring buffer cursor (decrements w/ wraparound, as newest time is at bottom)
-            gram_iy = (gram_iy + Y - 1) % Y
-
             # insert the new row of pixels into two places within the doubled ring buffer, so that a
             # contiguous slice of it can always be plotted, ending at the most recent row
             gram_ring[gram_iy + 0, :, :] = bins_rgba
             gram_ring[gram_iy + Y, :, :] = bins_rgba
 
         if main_thread_work.empty():
-            if gram_im:
-                # update which subset of the doubled ring buffer will be shown
-                gram_im.set_data(gram_ring[gram_iy:(gram_iy + Y), :])
+            for ic in range(C):
+                if gram_ims[ic]:
+                    # update which subset of the doubled ring buffer will be shown
+                    gram_ims[ic].set_data(gram_rings[ic][gram_iy:(gram_iy + Y), :])
 
-                gram_ax.draw_artist(gram_im)
-                fig.canvas.blit(gram_ax.bbox)
+                    gram_axes[ic].draw_artist(gram_ims[ic])
+                    fig.canvas.blit(gram_axes[ic].bbox)
 
             fig.canvas.flush_events()
 
