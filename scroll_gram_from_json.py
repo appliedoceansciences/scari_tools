@@ -128,7 +128,7 @@ def main():
     parser.add_argument('--title', default=None, help='Plot title')
     a = parser.parse_args()
 
-    cfloor, divide_by_bandwidth, title = a.cfloor, a.divide_by_bandwidth, a.title
+    cfloor, divide_by_bandwidth, suptitle = a.cfloor, a.divide_by_bandwidth, a.title
 
     if cfloor is None:
         cfloor = -150 if divide_by_bandwidth else -130
@@ -137,9 +137,6 @@ def main():
 
     # create an empty figure but don't show it yet
     fig = plt.figure()
-    if title is not None:
-        fig.suptitle(title)
-        fig.canvas.manager.set_window_title(title)
 
     fig.canvas.mpl_connect('close_event', on_close)
 
@@ -218,6 +215,10 @@ def main():
                 tick_positions_bins = [bin_index_given_frequency(x, df, bins_per_octave) for x in tick_positions_Hz]
                 gram_ax.set_xticks(tick_positions_bins)
                 gram_ax.set_xticklabels(tick_positions_Hz, rotation=45)
+
+                if suptitle is not None and not fig.get_suptitle():
+                    fig.suptitle(suptitle)
+                    fig.canvas.manager.set_window_title(suptitle)
 
                 fig.show()
 
