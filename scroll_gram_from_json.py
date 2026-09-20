@@ -196,11 +196,6 @@ def main():
                 # override an expensive method inside matplotlib that tries to do too much
                 gram_im._make_image = _make_image_override.__get__(gram_im, matplotlib.image.AxesImage)
 
-                title = '%u bins per octave' % bins_per_octave
-                if divide_by_bandwidth:
-                    title = title + ', divided by bandwidth'
-
-                gram_ax.set(title=title)
 
                 # label the x axis for the subplots on the bottom
                 gram_ax.set(xlabel='Frequency (Hz)')
@@ -216,7 +211,12 @@ def main():
                 gram_ax.set_xticks(tick_positions_bins)
                 gram_ax.set_xticklabels(tick_positions_Hz, rotation=45)
 
-                if suptitle is not None and not fig.get_suptitle():
+                if not fig.get_suptitle():
+                    suptitle = suptitle + ', ' if suptitle else ''
+
+                    suptitle = suptitle + '%u bins per octave' % bins_per_octave
+                    if divide_by_bandwidth:
+                        suptitle = suptitle + ', divided by bandwidth'
                     fig.suptitle(suptitle)
                     fig.canvas.manager.set_window_title(suptitle)
 
